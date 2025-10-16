@@ -1,11 +1,15 @@
 import Link from 'next/link'
 import EventCarousel from '@/components/EventCarousel'
+import SponsorCarousel from '@/components/SponsorCarousel'
 
 export default function Home() {
   return (
     <div className="bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Event Promotion Carousel */}
       <EventCarousel />
+
+      {/* Sponsor Carousel */}
+      <SponsorCarousel />
 
       {/* Features Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
