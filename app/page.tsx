@@ -1,13 +1,9 @@
 import Link from 'next/link'
-import Navbar from '@/components/Navbar'
 import EventCarousel from '@/components/EventCarousel'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Navigation */}
-      <Navbar />
-      
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Event Promotion Carousel */}
       <EventCarousel />
 

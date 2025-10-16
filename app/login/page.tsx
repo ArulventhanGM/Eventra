@@ -19,7 +19,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-100 to-blue-200">
+    <div className="relative overflow-hidden bg-gradient-to-br from-blue-100 to-blue-200 min-h-screen">
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
         {/* Gradient Circles */}

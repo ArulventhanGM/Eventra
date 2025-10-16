@@ -15,7 +15,7 @@ export default function MyTickets() {
             <p className="text-center font-mono">QR Code Here</p>
           </div>
           <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-            View Details
+            Register Now!
           </button>
         </div>
         
@@ -29,7 +29,7 @@ export default function MyTickets() {
             <p className="text-center font-mono">QR Code Here</p>
           </div>
           <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-            View Details
+            Register Now!
           </button>
         </div>
       </div>

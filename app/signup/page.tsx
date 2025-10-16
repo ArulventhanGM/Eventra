@@ -77,7 +77,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#DCE8FF' }}>
+    <div className="relative overflow-hidden min-h-screen" style={{ backgroundColor: '#DCE8FF' }}>
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
         {/* Gradient Circles - Following the CSS pattern */}
@@ -260,10 +260,10 @@ export default function Signup() {
             }}
           />
 
-          <div className="text-center text-white">
+          <div className="text-center text-black">
             <h3 className="text-3xl font-bold mb-4">Welcome to</h3>
             <h2 className="text-5xl font-extrabold">Eventra</h2>
-            <p className="text-lg mt-4 opacity-90">Smart Event Management</p>
+            <p className="text-lg mt-4 opacity-90">College Event Management</p>
           </div>
         </div>
       </motion.div>
