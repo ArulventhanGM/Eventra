@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { signIn, getSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -9,13 +11,40 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
-    // Simulate login process
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
+
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        // Check user role and redirect accordingly
+        const session = await getSession();
+        if (session?.user?.role === 'ORGANIZER') {
+          router.push('/organizer-dashboard');
+        } else if (session?.user?.role === 'ADMIN') {
+          router.push('/admin');
+        } else {
+          router.push('/attendee-dashboard');
+        }
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -191,6 +220,17 @@ export default function Login() {
           </motion.h1>
 
           {/* Login Form */}
+          {/* Error Message */}
+          {error && (
+            <motion.div 
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {error}
+            </motion.div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <motion.div
               initial={{ opacity: 0, x: -20 }}

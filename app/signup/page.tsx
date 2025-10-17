@@ -6,15 +6,17 @@ import { motion } from 'framer-motion';
 
 export default function Signup() {
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
+    phone: '',
     college: '',
     department: '',
     year: '',
     rollNumber: '',
-    role: '',
+    role: 'ATTENDEE',
     agreeTerms: false,
     receiveUpdates: false
   });
@@ -22,6 +24,8 @@ export default function Signup() {
   const [passwordStrength, setPasswordStrength] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const checkPasswordStrength = (password: string) => {
     if (password.length < 6) return 'Weak';
@@ -34,18 +38,73 @@ export default function Signup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
+
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
+      setError('Passwords do not match!');
       return;
     }
     if (!formData.agreeTerms) {
-      alert('Please agree to Terms & Privacy Policy');
+      setError('Please agree to Terms & Privacy Policy');
       return;
     }
+    if (!formData.firstName || !formData.lastName || !formData.email) {
+      setError('Please fill in all required fields');
+      return;
+    }
+
     setIsLoading(true);
-    // Simulate signup process
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsLoading(false);
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          phone: formData.phone,
+          college: formData.college,
+          department: formData.department,
+          year: formData.year,
+          rollNumber: formData.rollNumber,
+          role: formData.role,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSuccess('Registration successful! You can now login with your credentials.');
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          phone: '',
+          college: '',
+          department: '',
+          year: '',
+          rollNumber: '',
+          role: 'ATTENDEE',
+          agreeTerms: false,
+          receiveUpdates: false
+        });
+      } else {
+        setError(data.error || 'Registration failed');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setError('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -288,9 +347,29 @@ export default function Signup() {
             Sign Up
           </motion.h1>
 
+          {/* Error and Success Messages */}
+          {error && (
+            <motion.div 
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {error}
+            </motion.div>
+          )}
+          {success && (
+            <motion.div 
+              className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {success}
+            </motion.div>
+          )}
+
           {/* Signup Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Full Name and Email Row */}
+            {/* First Name and Last Name Row */}
             <div className="grid grid-cols-2 gap-4">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -299,12 +378,65 @@ export default function Signup() {
               >
                 <input
                   type="text"
-                  name="fullName"
-                  placeholder="Full Name"
-                  value={formData.fullName}
+                  name="firstName"
+                  placeholder="First Name"
+                  value={formData.firstName}
                   onChange={handleInputChange}
                   className="w-full h-[50px] bg-purple-100 rounded-lg px-5 text-base placeholder-gray-600 placeholder-opacity-75 focus:outline-none focus:ring-3 focus:ring-purple-200 transition-all duration-300"
                   required
+                />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.45, duration: 0.6 }}
+              >
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Last Name"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  className="w-full h-[50px] bg-purple-100 rounded-lg px-5 text-base placeholder-gray-600 placeholder-opacity-75 focus:outline-none focus:ring-3 focus:ring-purple-200 transition-all duration-300"
+                  required
+                />
+              </motion.div>
+            </div>
+
+            {/* Email Row */}
+            <div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+              >
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full h-[50px] bg-purple-100 rounded-lg px-5 text-base placeholder-gray-600 placeholder-opacity-75 focus:outline-none focus:ring-3 focus:ring-purple-200 transition-all duration-300"
+                  required
+                />
+              </motion.div>
+            </div>
+
+            {/* Phone Row */}
+            <div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.55, duration: 0.6 }}
+              >
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone Number (Optional)"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="w-full h-[50px] bg-purple-100 rounded-lg px-5 text-base placeholder-gray-600 placeholder-opacity-75 focus:outline-none focus:ring-3 focus:ring-purple-200 transition-all duration-300"
                 />
               </motion.div>
 

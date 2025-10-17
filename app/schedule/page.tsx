@@ -6,18 +6,26 @@ import Link from 'next/link';
 
 // Type definitions
 interface Event {
-  id: number;
+  id: string;
   title: string;
   startTime: string;
   endTime: string;
+  startDate: string;
+  endDate: string;
   venue: string;
   organizer: string;
+  organizerEmail: string;
   category: string;
   description: string;
-  speaker: string;
-  registrationRequired: boolean;
-  maxCapacity: number;
+  shortDescription?: string;
+  capacity?: number;
   currentRegistrations: number;
+  registrationRequired: boolean;
+  ticketPrice: number;
+  bannerImage?: string;
+  isOnline: boolean;
+  onlineLink?: string;
+  status: string;
 }
 
 interface CalendarDay {
@@ -32,104 +40,6 @@ type CategoryColors = {
   [key: string]: string;
 };
 
-// Mock data for events
-const mockEvents = [
-  {
-    id: 1,
-    title: "AI & Machine Learning Workshop",
-    startTime: "09:00",
-    endTime: "11:00",
-    venue: "Computer Lab A",
-    organizer: "Tech Club",
-    category: "Tech",
-    description: "Learn the fundamentals of AI and ML with hands-on coding sessions.",
-    speaker: "Dr. Sarah Johnson",
-    registrationRequired: true,
-    maxCapacity: 50,
-    currentRegistrations: 32
-  },
-  {
-    id: 2,
-    title: "Cultural Dance Performance",
-    startTime: "10:30",
-    endTime: "11:30",
-    venue: "Main Auditorium",
-    organizer: "Cultural Committee",
-    category: "Cultural",
-    description: "Traditional and contemporary dance performances by student groups.",
-    speaker: "Various Artists",
-    registrationRequired: false,
-    maxCapacity: 500,
-    currentRegistrations: 245
-  },
-  {
-    id: 3,
-    title: "Startup Pitch Competition",
-    startTime: "11:00",
-    endTime: "13:00",
-    venue: "Seminar Hall",
-    organizer: "Entrepreneurship Cell",
-    category: "Tech",
-    description: "Students present their startup ideas to industry experts.",
-    speaker: "Panel of Judges",
-    registrationRequired: true,
-    maxCapacity: 30,
-    currentRegistrations: 28
-  },
-  {
-    id: 4,
-    title: "Photography Workshop",
-    startTime: "14:00",
-    endTime: "16:00",
-    venue: "Art Studio",
-    organizer: "Photography Club",
-    category: "Workshop",
-    description: "Professional photography techniques and portfolio building.",
-    speaker: "Mark Williams",
-    registrationRequired: true,
-    maxCapacity: 25,
-    currentRegistrations: 18
-  },
-  {
-    id: 5,
-    title: "Basketball Tournament Finals",
-    startTime: "15:00",
-    endTime: "17:00",
-    venue: "Sports Complex",
-    organizer: "Sports Committee",
-    category: "Sports",
-    description: "Final match of the inter-department basketball tournament.",
-    speaker: "Team Captains",
-    registrationRequired: false,
-    maxCapacity: 200,
-    currentRegistrations: 156
-  },
-  {
-    id: 6,
-    title: "Music Concert",
-    startTime: "18:00",
-    endTime: "21:00",
-    venue: "Open Ground",
-    organizer: "Music Society",
-    category: "Cultural",
-    description: "Live music performances by student bands and guest artists.",
-    speaker: "Multiple Bands",
-    registrationRequired: false,
-    maxCapacity: 1000,
-    currentRegistrations: 687
-  }
-];
-
-const days = ["Day 1", "Day 2", "Day 3"];
-const categories = ["All", "Tech", "Cultural", "Sports", "Workshop"];
-
-const categoryColors: CategoryColors = {
-  Tech: "bg-indigo-100 text-indigo-800 border-indigo-200",
-  Cultural: "bg-pink-100 text-pink-800 border-pink-200",
-  Sports: "bg-green-100 text-green-800 border-green-200",
-  Workshop: "bg-yellow-100 text-yellow-800 border-yellow-200"
-};
-
 export default function Schedule() {
   const [selectedDay, setSelectedDay] = useState<string>("Day 1");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -138,6 +48,33 @@ export default function Schedule() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [mySchedule, setMySchedule] = useState<Event[]>([]);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch events from API
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/events');
+        const data = await response.json();
+        
+        if (data.success) {
+          setEvents(data.data);
+        } else {
+          setError(data.error || 'Failed to fetch events');
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        setError('Failed to connect to server');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   // Update current time every minute
   useEffect(() => {
@@ -147,10 +84,24 @@ export default function Schedule() {
     return () => clearInterval(timer);
   }, []);
 
+  // Generate dynamic categories from events
+  const categories = ["All", ...Array.from(new Set(events.map(event => event.category)))];
+  const days = ["Day 1", "Day 2", "Day 3"];
+
+  const categoryColors: CategoryColors = {
+    TECH: "bg-indigo-100 text-indigo-800 border-indigo-200",
+    CULTURAL: "bg-pink-100 text-pink-800 border-pink-200",
+    SPORTS: "bg-green-100 text-green-800 border-green-200",
+    WORKSHOP: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    ACADEMIC: "bg-blue-100 text-blue-800 border-blue-200",
+    SOCIAL: "bg-purple-100 text-purple-800 border-purple-200",
+  };
+
   // Filter events based on search and category
-  const filteredEvents = mockEvents.filter((event: Event) => {
+  const filteredEvents = events.filter((event: Event) => {
     const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.organizer.toLowerCase().includes(searchQuery.toLowerCase());
+                         event.organizer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         event.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === "All" || event.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -179,7 +130,7 @@ export default function Schedule() {
   };
 
   // Remove event from personal schedule
-  const removeFromSchedule = (eventId: number) => {
+  const removeFromSchedule = (eventId: string) => {
     setMySchedule(mySchedule.filter(e => e.id !== eventId));
   };
 
@@ -230,15 +181,19 @@ export default function Schedule() {
   // Get events for a specific date (mock implementation)
   const getEventsForDate = (date: Date): Event[] => {
     // In a real app, this would filter events by date
-    // For now, we'll distribute our mock events across different days
+    // For now, we'll distribute our events across different days
     const dayOfMonth = date.getDate();
-    const eventsMap: { [key: number]: Event[] } = {
-      4: [mockEvents[0]], // AI Workshop on 4th
-      11: [mockEvents[2]], // Startup Pitch on 11th
-      12: [mockEvents[1], mockEvents[3]], // Multiple events on 12th
-      15: [mockEvents[4]], // Basketball on 15th
-      20: [mockEvents[5]], // Music Concert on 20th
-    };
+    if (events.length === 0) return [];
+    
+    const eventsMap: { [key: number]: Event[] } = {};
+    
+    // Distribute events across different days
+    events.forEach((event, index) => {
+      const targetDay = 4 + (index * 3); // Spread events across month
+      if (!eventsMap[targetDay]) eventsMap[targetDay] = [];
+      eventsMap[targetDay].push(event);
+    });
+    
     return eventsMap[dayOfMonth] || [];
   };
 
@@ -381,7 +336,37 @@ export default function Schedule() {
 
         {/* Events Display */}
         <AnimatePresence mode="wait">
-          {viewMode === "timeline" ? (
+          {loading ? (
+            // Loading State
+            <motion.div 
+              className="text-center py-12"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="text-6xl mb-4">⏳</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Loading Events...</h3>
+              <p className="text-gray-600">Fetching the latest event information</p>
+            </motion.div>
+          ) : error ? (
+            // Error State
+            <motion.div 
+              className="text-center py-12"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="text-6xl mb-4">❌</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Failed to Load Events</h3>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+              >
+                Try Again
+              </button>
+            </motion.div>
+          ) : viewMode === "timeline" ? (
             // Timeline View
             <motion.div 
               key="timeline"
@@ -463,7 +448,7 @@ export default function Schedule() {
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
                                 <span className="text-gray-600">
-                                  {event.currentRegistrations}/{event.maxCapacity} registered
+                                  {event.currentRegistrations}/{event.capacity || 0} registered
                                 </span>
                               </div>
                               {event.registrationRequired && (
@@ -756,8 +741,8 @@ export default function Schedule() {
                         <p className="text-gray-600">{selectedEvent.organizer}</p>
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-1">Speaker</h4>
-                        <p className="text-gray-600">{selectedEvent.speaker}</p>
+                        <h4 className="font-medium text-gray-900 mb-1">Organizer</h4>
+                        <p className="text-gray-600">{selectedEvent.organizer}</p>
                       </div>
                     </div>
 
@@ -769,17 +754,17 @@ export default function Schedule() {
                     <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-lg">
                       <div>
                         <p className="font-medium text-indigo-900">
-                          {selectedEvent.currentRegistrations}/{selectedEvent.maxCapacity} Registered
+                          {selectedEvent.currentRegistrations}/{selectedEvent.capacity || 0} Registered
                         </p>
                         <p className="text-sm text-indigo-600">
-                          {selectedEvent.maxCapacity - selectedEvent.currentRegistrations} spots remaining
+                          {(selectedEvent.capacity || 0) - selectedEvent.currentRegistrations} spots remaining
                         </p>
                       </div>
                       <div className="w-24 h-2 bg-gray-200 rounded-full">
                         <div 
                           className="h-full bg-indigo-600 rounded-full"
                           style={{ 
-                            width: `${(selectedEvent.currentRegistrations / selectedEvent.maxCapacity) * 100}%` 
+                            width: `${(selectedEvent.currentRegistrations / (selectedEvent.capacity || 1)) * 100}%` 
                           }}
                         />
                       </div>

@@ -6,50 +6,58 @@ const sponsorLogos = [
   {
     id: 1,
     name: "TechCorp",
-    logo: "https://via.placeholder.com/200x80/3B82F6/FFFFFF?text=TechCorp",
-    alt: "TechCorp - Technology Solutions"
+    logo: null,
+    alt: "TechCorp - Technology Solutions",
+    color: "bg-blue-500"
   },
   {
     id: 2,
     name: "InnovateLab",
-    logo: "https://via.placeholder.com/200x80/10B981/FFFFFF?text=InnovateLab",
-    alt: "InnovateLab - Innovation Hub"
+    logo: null,
+    alt: "InnovateLab - Innovation Hub",
+    color: "bg-emerald-500"
   },
   {
     id: 3,
     name: "FutureTech",
-    logo: "https://via.placeholder.com/200x80/8B5CF6/FFFFFF?text=FutureTech",
-    alt: "FutureTech - Future Solutions"
+    logo: null,
+    alt: "FutureTech - Future Solutions",
+    color: "bg-violet-500"
   },
   {
     id: 4,
     name: "DevSoft",
-    logo: "https://via.placeholder.com/200x80/F59E0B/FFFFFF?text=DevSoft",
-    alt: "DevSoft - Software Development"
+    logo: null,
+    alt: "DevSoft - Software Development",
+    color: "bg-amber-500"
   },
   {
     id: 5,
     name: "CloudBase",
-    logo: "https://via.placeholder.com/200x80/EF4444/FFFFFF?text=CloudBase",
-    alt: "CloudBase - Cloud Solutions"
+    logo: null,
+    alt: "CloudBase - Cloud Solutions",
+    color: "bg-red-500"
   },
   {
     id: 6,
     name: "DataFlow",
-    logo: "https://via.placeholder.com/200x80/06B6D4/FFFFFF?text=DataFlow",
-    alt: "DataFlow - Data Analytics"
+    logo: null,
+    alt: "DataFlow - Data Analytics",
+    color: "bg-cyan-500"
   },
   {
     id: 7,
     name: "SmartSys",
-    logo: "https://via.placeholder.com/200x80/84CC16/FFFFFF?text=SmartSys",
-    alt: "SmartSys - Smart Systems"
+    logo: null,
+    alt: "SmartSys - Smart Systems",
+    color: "bg-lime-500"
   },
   {
     id: 8,
     name: "NextGen",
-    logo: "https://via.placeholder.com/200x80/F97316/FFFFFF?text=NextGen",
-    alt: "NextGen - Next Generation Tech"
+    logo: null,
+    alt: "NextGen - Next Generation Tech",
+    color: "bg-orange-500"
   }
 ];
 
@@ -94,11 +102,9 @@ export default function SponsorCarousel() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
               >
-                <img
-                  src={sponsor.logo}
-                  alt={sponsor.alt}
-                  className="h-16 w-auto object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300 opacity-70 group-hover:opacity-100"
-                />
+                <div className={`h-16 w-32 ${sponsor.color} rounded-lg flex items-center justify-center filter grayscale group-hover:grayscale-0 transition-all duration-300 opacity-70 group-hover:opacity-100`}>
+                  <span className="text-white font-bold text-sm">{sponsor.name}</span>
+                </div>
               </motion.div>
             ))}
           </motion.div>
