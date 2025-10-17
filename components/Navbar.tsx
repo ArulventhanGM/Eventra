@@ -24,9 +24,6 @@ export default function Navbar() {
             <Link href="/schedule" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
               Schedule
             </Link>
-            <Link href="/sponsors" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-              Sponsors
-            </Link>
             <Link href="/help" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
               Help
             </Link>
@@ -72,9 +69,6 @@ export default function Navbar() {
               </Link>
               <Link href="/schedule" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                 Schedule
-              </Link>
-              <Link href="/sponsors" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                Sponsors
               </Link>
               <Link href="/help" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                 Help
