@@ -1,0 +1,32 @@
+# ===========================================
+# RENDER DEPLOYMENT ENVIRONMENT VARIABLES
+# ===========================================
+# Add these variables to your Render service's Environment tab
+
+# Database (your Render PostgreSQL - already correct)
+DATABASE_URL=postgresql://eventra_backend_db_user:RzUNMl80MiW1nWyNWYz3wdFp5uxlE1rR@dpg-d3p1tu2li9vc73cojcqg-a.oregon-postgres.render.com/eventra_backend_db
+
+# NextAuth Configuration
+NEXTAUTH_URL=https://your-app-name.onrender.com
+NEXTAUTH_SECRET=your-super-secret-key-for-production-minimum-32-characters-long
+
+# Node Environment
+NODE_ENV=production
+
+# Optional (can be added later)
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+
+# ===========================================
+# INSTRUCTIONS:
+# ===========================================
+# 1. Go to your Render dashboard
+# 2. Find your web service
+# 3. Go to Environment tab
+# 4. Add each variable above (one per line)
+# 5. Replace "your-app-name" with your actual Render app name
+# 6. Generate a strong NEXTAUTH_SECRET (32+ characters)
+# 7. Click "Deploy Latest Commit" to redeploy
