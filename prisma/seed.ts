@@ -1,9 +1,13 @@
 import { PrismaClient, EventCategory, TicketType, EventStatus, UserRole } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Starting database seed...');
+
+  // Hash passwords
+  const hashedPassword = await bcrypt.hash('password123', 12);
 
   // Create a sample organizer user
   const organizer = await prisma.user.upsert({
@@ -11,7 +15,7 @@ async function main() {
     update: {},
     create: {
       email: 'organizer@eventra.com',
-      password: 'hashed_password_here', // In real app, this should be properly hashed
+      password: hashedPassword,
       firstName: 'Event',
       lastName: 'Organizer',
       phone: '+1234567890',
@@ -22,6 +26,24 @@ async function main() {
   });
 
   console.log('✅ Created organizer user');
+
+  // Create a sample attendee user
+  const attendee = await prisma.user.upsert({
+    where: { email: 'attendee@eventra.com' },
+    update: {},
+    create: {
+      email: 'attendee@eventra.com',
+      password: hashedPassword,
+      firstName: 'John',
+      lastName: 'Doe',
+      phone: '+1234567891',
+      college: 'Eventra University',
+      department: 'Business Administration',
+      role: UserRole.ATTENDEE,
+    },
+  });
+
+  console.log('✅ Created attendee user');
 
   // Create sample events
   const events = [
