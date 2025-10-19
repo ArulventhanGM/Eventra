@@ -66,6 +66,7 @@ export default function Navbar() {
             {status === 'loading' ? (
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+                <span className="text-sm text-gray-500 hidden sm:block">Loading...</span>
               </div>
             ) : session ? (
               <div className="relative" ref={dropdownRef}>
