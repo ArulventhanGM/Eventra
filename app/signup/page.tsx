@@ -439,22 +439,6 @@ export default function Signup() {
                   className="w-full h-[50px] bg-purple-100 rounded-lg px-5 text-base placeholder-gray-600 placeholder-opacity-75 focus:outline-none focus:ring-3 focus:ring-purple-200 transition-all duration-300"
                 />
               </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5, duration: 0.6 }}
-              >
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email Address"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full h-[50px] bg-purple-100 rounded-lg px-5 text-base placeholder-gray-600 placeholder-opacity-75 focus:outline-none focus:ring-3 focus:ring-purple-200 transition-all duration-300"
-                  required
-                />
-              </motion.div>
             </div>
 
             {/* Password Fields Row */}
