@@ -5,57 +5,17 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  ATTENDEE
-  ORGANIZER
-  VOLUNTEER
-  SPONSOR
-  ADMIN
-}
-
-enum EventStatus {
-  DRAFT
-  PUBLISHED
-  ONGOING
-  COMPLETED
-  CANCELLED
-}
-
-enum EventCategory {
-  TECH
-  CULTURAL
-  SPORTS
-  LITERARY
-  ACADEMIC
-  SOCIAL
-  WORKSHOP
-  SEMINAR
-  CONFERENCE
-  OTHER
-}
-
-enum TicketType {
-  FREE
-  PAID
-}
-
-enum TicketStatus {
-  ACTIVE
-  USED
-  CANCELLED
-  EXPIRED
-}
-
-enum RegistrationStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-  WAITLISTED
-}
+// Enums converted to strings for SQLite compatibility
+// UserRole: ATTENDEE, ORGANIZER, VOLUNTEER, SPONSOR, ADMIN
+// EventStatus: DRAFT, PUBLISHED, ONGOING, COMPLETED, CANCELLED  
+// EventCategory: TECH, CULTURAL, SPORTS, LITERARY, ACADEMIC, SOCIAL, WORKSHOP, SEMINAR, CONFERENCE, OTHER
+// TicketType: FREE, PAID
+// TicketStatus: ACTIVE, USED, CANCELLED, EXPIRED
+// RegistrationStatus: PENDING, CONFIRMED, CANCELLED, WAITLISTED
 
 model User {
   id          String   @id @default(cuid())
@@ -69,7 +29,7 @@ model User {
   department  String?
   year        String?
   rollNumber  String?
-  role        UserRole @default(ATTENDEE)
+  role        String   @default("ATTENDEE")
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -91,11 +51,11 @@ model User {
 model Event {
   id              String        @id @default(cuid())
   title           String
-  description     String        @db.Text
+  description     String
   shortDescription String?
   bannerImage     String?
-  category        EventCategory
-  status          EventStatus   @default(DRAFT)
+  category             String
+  status               String        @default("DRAFT")
   startDate       DateTime
   endDate         DateTime
   registrationDeadline DateTime?
@@ -103,9 +63,9 @@ model Event {
   capacity        Int?
   isOnline        Boolean       @default(false)
   onlineLink      String?
-  ticketType      TicketType    @default(FREE)
+    ticketType           String        @default("FREE")
   ticketPrice     Float?        @default(0)
-  tags            String[]
+  tags            String? // JSON string for SQLite compatibility
   organizerId     String
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
@@ -127,7 +87,7 @@ model Event {
 model Session {
   id          String   @id @default(cuid())
   title       String
-  description String?  @db.Text
+  description String?
   startTime   DateTime
   endTime     DateTime
   venue       String?
@@ -146,19 +106,32 @@ model Session {
 }
 
 model Registration {
-  id          String             @id @default(cuid())
-  userId      String
-  eventId     String
-  status      RegistrationStatus @default(PENDING)
-  registeredAt DateTime          @default(now())
-  updatedAt   DateTime           @updatedAt
+  id               String             @id @default(cuid())
+  userId           String?            // Optional - for registered users
+  eventId          String
+  
+  // Guest registration fields
+  fullName         String?
+  email            String?
+  college          String?
+  department       String?
+  phoneNumber      String?
+  teamName         String?
+  numberOfMembers  Int?               @default(1)
+  additionalInfo   String?
+  registrationId   String?            @unique
+  
+  status           String             @default("PENDING")
+  registeredAt     DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 
   // Relations
-  user        User   @relation(fields: [userId], references: [id])
-  event       Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  ticket      Ticket?
+  user             User?              @relation(fields: [userId], references: [id])
+  event            Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticket           Ticket?
 
   @@unique([userId, eventId])
+  @@unique([email, eventId])
   @@map("registrations")
 }
 
@@ -168,7 +141,7 @@ model Ticket {
   userId         String
   eventId        String
   registrationId String       @unique
-  status         TicketStatus @default(ACTIVE)
+  status         String       @default("ACTIVE")
   issuedAt       DateTime     @default(now())
   usedAt         DateTime?
 
@@ -237,7 +210,7 @@ model Sponsorship {
 model Announcement {
   id        String   @id @default(cuid())
   title     String
-  message   String   @db.Text
+  message   String
   eventId   String
   authorId  String
   isUrgent  Boolean  @default(false)
@@ -255,7 +228,7 @@ model Feedback {
   eventId   String
   userId    String
   rating    Int      @default(5) // 1-5 stars
-  comment   String?  @db.Text
+  comment   String?
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
 

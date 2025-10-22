@@ -4,6 +4,25 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
+// Event interface for TypeScript
+interface Event {
+  id: number;
+  title: string;
+  organizer: string;
+  date: string;
+  time: string;
+  venue: string;
+  category: string;
+  mode: string;
+  fee: string;
+  capacity: number;
+  registered: number;
+  registrationDeadline: string;
+  poster: string;
+  description: string;
+  tags: string[];
+}
+
 // Utility function for consistent date formatting
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -13,126 +32,61 @@ const formatDate = (dateString: string) => {
   return `${day}/${month}/${year}`;
 };
 
-// Mock data for events
-const mockEvents = [
-  {
-    id: 1,
-    title: "TechFest 2024",
-    organizer: "Computer Science Department",
-    date: "2024-11-15",
-    time: "09:00 AM",
-    venue: "Main Auditorium",
-    category: "Tech",
-    mode: "Offline",
-    fee: "Free",
-    capacity: 500,
-    registered: 245,
-    registrationDeadline: "2024-11-10",
-    poster: "/api/placeholder/300/200",
-    description: "Annual technology festival featuring workshops, competitions, and tech talks.",
-    tags: ["Programming", "AI", "Web Development"]
-  },
-  {
-    id: 2,
-    title: "Cultural Night 2024",
-    organizer: "Cultural Committee",
-    date: "2024-11-20",
-    time: "06:00 PM",
-    venue: "Open Grounds",
-    category: "Cultural",
-    mode: "Offline",
-    fee: "₹50",
-    capacity: 1000,
-    registered: 678,
-    registrationDeadline: "2024-11-18",
-    poster: "/api/placeholder/300/200",
-    description: "Celebrate diversity through dance, music, and theatrical performances.",
-    tags: ["Dance", "Music", "Theatre"]
-  },
-  {
-    id: 3,
-    title: "Sports Meet 2024",
-    organizer: "Sports Committee",
-    date: "2024-11-25",
-    time: "08:00 AM",
-    venue: "Sports Complex",
-    category: "Sports",
-    mode: "Offline",
-    fee: "₹100",
-    capacity: 300,
-    registered: 156,
-    registrationDeadline: "2024-11-22",
-    poster: "/api/placeholder/300/200",
-    description: "Inter-departmental sports competition with multiple events.",
-    tags: ["Football", "Basketball", "Athletics"]
-  },
-  {
-    id: 4,
-    title: "Innovation Summit",
-    organizer: "Entrepreneurship Cell",
-    date: "2024-12-01",
-    time: "10:00 AM",
-    venue: "Virtual + Main Hall",
-    category: "Business",
-    mode: "Hybrid",
-    fee: "₹200",
-    capacity: 400,
-    registered: 89,
-    registrationDeadline: "2024-11-28",
-    poster: "/api/placeholder/300/200",
-    description: "Connect with industry leaders and showcase innovative ideas.",
-    tags: ["Startup", "Innovation", "Networking"]
-  },
-  {
-    id: 5,
-    title: "Art Exhibition",
-    organizer: "Fine Arts Department",
-    date: "2024-12-05",
-    time: "11:00 AM",
-    venue: "Art Gallery",
-    category: "Cultural",
-    mode: "Offline",
-    fee: "Free",
-    capacity: 200,
-    registered: 67,
-    registrationDeadline: "2024-12-03",
-    poster: "/api/placeholder/300/200",
-    description: "Showcase of student artwork across various mediums.",
-    tags: ["Painting", "Sculpture", "Digital Art"]
-  },
-  {
-    id: 6,
-    title: "Hackathon 2024",
-    organizer: "Tech Club",
-    date: "2024-12-10",
-    time: "09:00 AM",
-    venue: "Computer Lab",
-    category: "Tech",
-    mode: "Offline",
-    fee: "₹150",
-    capacity: 150,
-    registered: 98,
-    registrationDeadline: "2024-12-07",
-    poster: "/api/placeholder/300/200",
-    description: "48-hour coding marathon to build innovative solutions.",
-    tags: ["Coding", "Innovation", "Competition"]
-  }
-];
+// Real events will be fetched from API
 
-const categories = ["All", "Tech", "Cultural", "Sports", "Business"];
+const categories = ["All", "Tech", "Cultural", "Sports"];
 const modes = ["All", "Online", "Offline", "Hybrid"];
 const sortOptions = ["Newest", "Popular", "Upcoming", "Registration Closing"];
 
 export default function Events() {
-  const [events, setEvents] = useState(mockEvents);
-  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedMode, setSelectedMode] = useState('All');
   const [sortBy, setSortBy] = useState('Newest');
   const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const eventsPerPage = 6;
+
+  // Fetch events from API
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/events');
+        const data = await response.json();
+        
+        if (data.success) {
+          // Transform API data to match component expectations
+          const transformedEvents = data.data.map((event: any) => ({
+            id: event.id,
+            title: event.title,
+            organizer: event.organizer,
+            date: event.startDate.split('T')[0], // Extract date part
+            time: event.startTime || "09:00 AM",
+            venue: event.venue,
+            category: event.category.charAt(0).toUpperCase() + event.category.slice(1).toLowerCase(),
+            mode: event.isOnline ? "Online" : "Offline",
+            fee: event.ticketPrice > 0 ? `₹${event.ticketPrice}` : "Free",
+            capacity: event.capacity,
+            registered: event.currentRegistrations,
+            registrationDeadline: event.startDate.split('T')[0],
+            poster: event.bannerImage || "/api/placeholder/300/200",
+            description: event.shortDescription || event.description,
+            tags: ["Event"] // Default tags since API doesn't return them
+          }));
+          setEvents(transformedEvents);
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   // Filter and search functionality
   useEffect(() => {
@@ -254,6 +208,7 @@ export default function Events() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  suppressHydrationWarning
                 />
               </div>
             </div>
