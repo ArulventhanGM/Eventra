@@ -54,10 +54,42 @@ export default function Events() {
     const fetchEvents = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/events');
-        const data = await response.json();
+        console.log('Fetching events from API...');
         
-        if (data.success) {
+        const response = await fetch('/api/events', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers.get('content-type'));
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Response is not JSON');
+        }
+        
+        const text = await response.text();
+        console.log('Raw response:', text.substring(0, 200) + '...');
+        
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (parseError) {
+          console.error('JSON parse error:', parseError);
+          console.error('Response text:', text);
+          throw new Error('Invalid JSON response from server');
+        }
+        
+        console.log('Parsed data:', data);
+        
+        if (data.success && Array.isArray(data.data)) {
           // Transform API data to match component expectations
           const transformedEvents = data.data.map((event: any) => ({
             id: event.id,
@@ -77,9 +109,14 @@ export default function Events() {
             tags: ["Event"] // Default tags since API doesn't return them
           }));
           setEvents(transformedEvents);
+          console.log('Successfully loaded', transformedEvents.length, 'events');
+        } else {
+          console.error('API returned unsuccessful response or invalid data structure:', data);
+          throw new Error(data.error || 'Failed to fetch events');
         }
       } catch (error) {
         console.error('Error fetching events:', error);
+        setEvents([]); // Set empty array to prevent undefined issues
       } finally {
         setIsLoading(false);
       }
