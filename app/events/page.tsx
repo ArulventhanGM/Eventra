@@ -54,69 +54,36 @@ export default function Events() {
     const fetchEvents = async () => {
       try {
         setIsLoading(true);
-        console.log('Fetching events from API...');
+        const response = await fetch('/api/events');
+        const data = await response.json();
         
-        const response = await fetch('/api/events', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers.get('content-type'));
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('Response is not JSON');
-        }
-        
-        const text = await response.text();
-        console.log('Raw response:', text.substring(0, 200) + '...');
-        
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (parseError) {
-          console.error('JSON parse error:', parseError);
-          console.error('Response text:', text);
-          throw new Error('Invalid JSON response from server');
-        }
-        
-        console.log('Parsed data:', data);
-        
-        if (data.success && Array.isArray(data.data)) {
+        if (data.success && data.data) {
           // Transform API data to match component expectations
           const transformedEvents = data.data.map((event: any) => ({
             id: event.id,
             title: event.title,
-            organizer: event.organizer,
-            date: event.startDate.split('T')[0], // Extract date part
+            organizer: event.organizer || 'Unknown Organizer',
+            date: new Date(event.startDate).toISOString().split('T')[0], // Extract date part
             time: event.startTime || "09:00 AM",
-            venue: event.venue,
-            category: event.category.charAt(0).toUpperCase() + event.category.slice(1).toLowerCase(),
+            venue: event.venue || 'TBA',
+            category: event.category ? event.category.charAt(0).toUpperCase() + event.category.slice(1).toLowerCase() : 'Other',
             mode: event.isOnline ? "Online" : "Offline",
             fee: event.ticketPrice > 0 ? `₹${event.ticketPrice}` : "Free",
-            capacity: event.capacity,
-            registered: event.currentRegistrations,
-            registrationDeadline: event.startDate.split('T')[0],
+            capacity: event.capacity || 0,
+            registered: event.currentRegistrations || 0,
+            registrationDeadline: new Date(event.startDate).toISOString().split('T')[0],
             poster: event.bannerImage || "/api/placeholder/300/200",
-            description: event.shortDescription || event.description,
+            description: event.shortDescription || event.description || 'No description available',
             tags: ["Event"] // Default tags since API doesn't return them
           }));
+          
           setEvents(transformedEvents);
-          console.log('Successfully loaded', transformedEvents.length, 'events');
         } else {
-          console.error('API returned unsuccessful response or invalid data structure:', data);
-          throw new Error(data.error || 'Failed to fetch events');
+          setEvents([]);
         }
       } catch (error) {
         console.error('Error fetching events:', error);
-        setEvents([]); // Set empty array to prevent undefined issues
+        setEvents([]);
       } finally {
         setIsLoading(false);
       }

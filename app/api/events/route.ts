@@ -5,27 +5,6 @@ export async function GET(request: NextRequest) {
   try {
     console.log('API /events called');
     
-    // Test database connection first
-    try {
-      await prisma.$connect();
-      console.log('Database connected successfully');
-    } catch (dbError) {
-      console.error('Database connection failed:', dbError);
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Database connection failed',
-          message: 'Unable to connect to the database. Please try again later.'
-        },
-        { 
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
-      );
-    }
-
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const search = searchParams.get('search');
@@ -61,8 +40,6 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    console.log('Fetching events with filters:', { category, search, startDate, endDate });
-
     // Fetch events with organizer and session information
     const events = await prisma.event.findMany({
       where,
@@ -89,8 +66,8 @@ export async function GET(request: NextRequest) {
         startDate: 'asc',
       },
     });
+    
 
-    console.log(`Successfully fetched ${events.length} events`);
 
     // Transform the data to match the frontend format
     const transformedEvents = events.map((event) => ({
@@ -98,8 +75,8 @@ export async function GET(request: NextRequest) {
       title: event.title,
       description: event.description,
       shortDescription: event.shortDescription,
-      startDate: event.startDate.toISOString(),
-      endDate: event.endDate.toISOString(),
+      startDate: event.startDate,
+      endDate: event.endDate,
       startTime: event.startDate.toLocaleTimeString('en-US', { 
         hour: '2-digit', 
         minute: '2-digit',
@@ -125,41 +102,17 @@ export async function GET(request: NextRequest) {
       status: event.status,
     }));
 
-    const response = {
+    return NextResponse.json({
       success: true,
       data: transformedEvents,
       count: transformedEvents.length,
-      timestamp: new Date().toISOString(),
-    };
-
-    console.log('Returning response with', transformedEvents.length, 'events');
-
-    return NextResponse.json(response, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache',
-      },
     });
 
   } catch (error) {
     console.error('Error fetching events:', error);
-    
-    const errorResponse = {
-      success: false,
-      error: 'Failed to fetch events',
-      message: error instanceof Error ? error.message : 'An unexpected error occurred',
-      timestamp: new Date().toISOString(),
-    };
-
-    return NextResponse.json(errorResponse, {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  } finally {
-    // Ensure database connection is closed
-    await prisma.$disconnect();
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch events' },
+      { status: 500 }
+    );
   }
 }
