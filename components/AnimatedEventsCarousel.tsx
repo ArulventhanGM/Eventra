@@ -30,8 +30,22 @@ export default function AnimatedEventsCarousel() {
         const data = await response.json();
         
         if (data.success && data.data) {
-          // Transform and limit to 6 events for carousel
-          const transformedEvents = data.data.slice(0, 6).map((event: any) => ({
+          // Remove duplicates based on event ID first, then by title as fallback
+          const uniqueEvents = data.data.filter((event: any, index: number, array: any[]) => {
+            // Primary deduplication by ID
+            const firstOccurrenceById = array.findIndex((e: any) => e.id === event.id) === index;
+            if (!firstOccurrenceById) return false;
+            
+            // Secondary deduplication by title (in case of different IDs but same event)
+            const firstOccurrenceByTitle = array.findIndex((e: any) => 
+              e.title?.toLowerCase().trim() === event.title?.toLowerCase().trim()
+            ) === index;
+            
+            return firstOccurrenceByTitle;
+          });
+          
+          // Transform and limit to 6 unique events for carousel
+          const transformedEvents = uniqueEvents.slice(0, 6).map((event: any) => ({
             id: event.id,
             title: event.title,
             date: new Date(event.startDate).toLocaleDateString('en-US', {

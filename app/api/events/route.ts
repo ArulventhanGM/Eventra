@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
     // Fetch events with organizer and session information
     const events = await prisma.event.findMany({
       where,
+      distinct: ['id'], // Ensure unique events by ID at database level
       include: {
         organizer: {
           select: {
