@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
+  console.log('🎫 Registration API called');
+  
   try {
     const body = await request.json();
+    console.log('📝 Registration data received:', body);
+    
     const {
       eventId,
       fullName,
@@ -34,12 +38,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is already registered for this event
+    console.log('🔍 Checking for existing registration...');
     const existingRegistration = await prisma.registration.findFirst({
       where: {
         eventId: eventId,
         email: email
       }
     });
+    console.log('📋 Existing registration:', existingRegistration ? 'Found' : 'None');
 
     if (existingRegistration) {
       return NextResponse.json(
@@ -49,6 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get event details to check capacity
+    console.log('🎪 Fetching event details for:', eventId);
     const event = await prisma.event.findUnique({
       where: { id: eventId },
       include: {
@@ -57,6 +64,7 @@ export async function POST(request: NextRequest) {
         }
       }
     });
+    console.log('🎯 Event found:', event ? event.title : 'Not found');
 
     if (!event) {
       return NextResponse.json(
@@ -82,6 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create registration
+    console.log('✍️ Creating registration...');
     const registration = await prisma.registration.create({
       data: {
         eventId,
@@ -96,6 +105,7 @@ export async function POST(request: NextRequest) {
         status: 'CONFIRMED'
       }
     });
+    console.log('✅ Registration created with ID:', registration.id);
 
     // Generate registration ID
     const registrationId = `REG${event.id}_${registration.id}`;
@@ -113,9 +123,15 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('❌ Registration error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: errorMessage,
+      stack: error instanceof Error ? error.stack : 'No stack trace'
+    });
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: 'Internal server error', details: errorMessage },
       { status: 500 }
     );
   }
