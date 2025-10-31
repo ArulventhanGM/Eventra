@@ -133,8 +133,11 @@ export default function GlassEventCard({ event, index }: GlassEventCardProps) {
           {/* Event Content */}
           <div className="p-6 bg-white/5 backdrop-blur-sm">
             <motion.h3 
-              className="text-xl font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-pink-300 group-hover:to-blue-300 group-hover:bg-clip-text transition-all duration-300"
-              whileHover={{ scale: 1.02 }}
+              className="text-xl font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-cyan-300 group-hover:via-yellow-300 group-hover:to-pink-300 group-hover:bg-clip-text transition-all duration-300 drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+              whileHover={{ 
+                scale: 1.05,
+                textShadow: "0 0 20px rgba(255, 255, 255, 0.9)"
+              }}
             >
               {event.title}
             </motion.h3>

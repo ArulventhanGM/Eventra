@@ -41,41 +41,66 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-black/20 backdrop-blur-lg border-b border-gray-400/20 shadow-lg sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-2xl font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
-              🎉 Eventra
+            <Link href="/">
+              <motion.div
+                whileHover={{ scale: 1.05, rotate: 2 }}
+                className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text cursor-pointer"
+              >
+                🎉 Eventra
+              </motion.div>
             </Link>
           </div>
           
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="/events" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-              Events
+          {/* Desktop Menu - Pure Glassmorphism */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Link href="/events">
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-white/90 hover:text-white bg-black/10 backdrop-blur-md border border-gray-400/20 hover:bg-black/20 hover:border-gray-300/40 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
+              >
+                Events
+              </motion.div>
             </Link>
-            <Link href="/schedule" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-              Schedule
+            <Link href="/schedule">
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-white/90 hover:text-white bg-black/10 backdrop-blur-md border border-gray-400/20 hover:bg-black/20 hover:border-gray-300/40 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
+              >
+                Schedule
+              </motion.div>
             </Link>
-            <Link href="/help" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-              Help
+            <Link href="/help">
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-white/90 hover:text-white bg-black/10 backdrop-blur-md border border-gray-400/20 hover:bg-black/20 hover:border-gray-300/40 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
+              >
+                Help
+              </motion.div>
             </Link>
             
-            {/* User Authentication Section */}
+            {/* User Authentication Section - Glassmorphism */}
             {status === 'loading' ? (
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-                <span className="text-sm text-gray-500 hidden sm:block">Loading...</span>
+                <div className="w-8 h-8 bg-black/20 backdrop-blur-md rounded-full animate-pulse border border-gray-400/30"></div>
+                <span className="text-sm text-white/70 hidden sm:block">Loading...</span>
               </div>
             ) : session ? (
               <div className="relative" ref={dropdownRef}>
-                <button
+                <motion.button
                   onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                  className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 transition-all duration-200 group"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center space-x-3 px-4 py-2 rounded-xl text-sm font-medium text-white/90 hover:text-white bg-black/10 backdrop-blur-md border border-gray-400/20 hover:bg-black/20 hover:border-gray-300/40 transition-all duration-300 group hover:shadow-lg hover:shadow-purple-500/20"
                 >
                   <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-semibold group-hover:bg-indigo-700 transition-colors">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-xs font-semibold group-hover:from-blue-600 group-hover:to-purple-600 transition-all border border-gray-300/30">
                       {getUserInitials(session.user.firstName, session.user.lastName)}
                     </div>
                     <span className="hidden lg:block">
@@ -90,9 +115,9 @@ export default function Navbar() {
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
-                </button>
+                </motion.button>
 
-                {/* User Dropdown Menu */}
+                {/* User Dropdown Menu - Glassmorphism */}
                 <AnimatePresence>
                   {isUserDropdownOpen && (
                     <motion.div
@@ -100,20 +125,20 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50"
+                      className="absolute right-0 mt-2 w-64 bg-black/20 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-400/20 py-2 z-50"
                     >
                       {/* User Info Header */}
-                      <div className="px-4 py-3 border-b border-gray-100">
+                      <div className="px-4 py-3 border-b border-gray-400/20">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-semibold">
+                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center font-semibold border border-gray-300/30">
                             {getUserInitials(session.user.firstName, session.user.lastName)}
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium text-white">
                               {session.user.firstName} {session.user.lastName}
                             </p>
-                            <p className="text-sm text-gray-500">{session.user.email}</p>
-                            <p className="text-xs text-indigo-600 font-medium">
+                            <p className="text-sm text-white/70">{session.user.email}</p>
+                            <p className="text-xs text-purple-300 font-medium">
                               {session.user.role?.toLowerCase()}
                             </p>
                           </div>
@@ -124,7 +149,7 @@ export default function Navbar() {
                       <div className="py-1">
                         <Link
                           href={getDashboardLink()}
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
+                          className="flex items-center mx-2 px-3 py-2 text-sm text-white/90 hover:text-white bg-black/5 hover:bg-black/10 backdrop-blur-sm border border-gray-400/10 hover:border-gray-300/30 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
                           <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,17 +206,19 @@ export default function Navbar() {
                           Account Settings
                         </Link>
 
-                        <div className="border-t border-gray-100 my-1"></div>
+                        <div className="border-t border-gray-400/20 my-2 mx-2"></div>
 
-                        <button
+                        <motion.button
                           onClick={handleSignOut}
-                          className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="flex items-center w-full mx-2 px-3 py-2 text-sm text-red-300 hover:text-red-200 bg-red-500/10 hover:bg-red-500/20 backdrop-blur-sm border border-red-400/20 hover:border-red-400/40 rounded-xl transition-all duration-300"
                         >
                           <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                           </svg>
                           Sign Out
-                        </button>
+                        </motion.button>
                       </div>
                     </motion.div>
                   )}
@@ -199,27 +226,35 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center space-x-3">
-                <Link 
-                  href="/login" 
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Login
+                <Link href="/login">
+                  <motion.div 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="text-white/90 hover:text-white bg-black/10 backdrop-blur-md border border-gray-400/20 hover:bg-black/20 hover:border-gray-300/40 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
+                  >
+                    Login
+                  </motion.div>
                 </Link>
-                <Link 
-                  href="/signup" 
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"
-                >
-                  Sign Up
+                <Link href="/signup">
+                  <motion.div 
+                    whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(168, 85, 247, 0.4)" }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border border-blue-300/30"
+                  >
+                    Sign Up
+                  </motion.div>
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile menu button - Glassmorphism */}
           <div className="md:hidden flex items-center">
-            <button
+            <motion.button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="text-white/90 hover:text-white bg-black/10 backdrop-blur-md border border-gray-400/20 hover:bg-black/20 hover:border-gray-300/40 p-2 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMenuOpen ? (
@@ -228,7 +263,7 @@ export default function Navbar() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
-            </button>
+            </motion.button>
           </div>
         </div>
 

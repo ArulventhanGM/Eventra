@@ -76,15 +76,21 @@ export default function GlassEventCarousel() {
   const [direction, setDirection] = useState(0);
 
   useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
     if (!isHovered) {
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         setDirection(1);
         setCurrentIndex((prev) => (prev + 1) % promotionalEvents.length);
-      }, 5000);
-
-      return () => clearInterval(interval);
+      }, 4000); // Reduced to 4 seconds for better UX
     }
-  }, [isHovered]);
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [isHovered, currentIndex]); // Added currentIndex to dependencies
 
   const goToSlide = (index: number) => {
     setDirection(index > currentIndex ? 1 : -1);
