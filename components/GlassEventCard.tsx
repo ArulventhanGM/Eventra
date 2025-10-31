@@ -63,6 +63,24 @@ const formatDate = (dateString: string) => {
 };
 
 export default function GlassEventCard({ event, index }: GlassEventCardProps) {
+  // Registration status calculations
+  const isRegistrationFull = event.registered >= event.capacity;
+  const isRegistrationExpired = new Date(event.registrationDeadline) < new Date();
+  const isRegistrationClosed = isRegistrationFull || isRegistrationExpired;
+  const isRegistrationClosingSoon = new Date(event.registrationDeadline) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  
+  // Calculate registration percentage
+  const registrationPercentage = Math.min((event.registered / event.capacity) * 100, 100);
+  const availableSlots = event.capacity - event.registered;
+  
+  // Determine registration status color
+  const getRegistrationStatusColor = () => {
+    if (isRegistrationClosed) return 'from-red-500 to-red-600';
+    if (registrationPercentage >= 90) return 'from-orange-500 to-red-500';
+    if (registrationPercentage >= 70) return 'from-yellow-500 to-orange-500';
+    return 'from-pink-500 to-purple-500';
+  };
+
   return (
     <motion.div
       className="group relative"
@@ -88,8 +106,28 @@ export default function GlassEventCard({ event, index }: GlassEventCardProps) {
           <div className="relative h-48 overflow-hidden rounded-t-2xl">
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
             
+            {/* Registration Status Badge */}
+            {isRegistrationClosed && (
+              <div className="absolute top-4 left-4 z-30">
+                <motion.div 
+                  className="flex items-center gap-1 bg-red-500/90 backdrop-blur-md border border-red-400/50 px-3 py-1 rounded-full shadow-lg"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span className="text-white text-xs font-semibold">
+                    {isRegistrationFull ? 'FULL' : 'CLOSED'}
+                  </span>
+                </motion.div>
+              </div>
+            )}
+
             {/* Category Badge */}
-            <div className="absolute top-4 left-4 z-20">
+            <div className={`absolute top-4 ${isRegistrationClosed ? 'left-4 mt-10' : 'left-4'} z-20`}>
               <motion.span 
                 className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md border border-white/30 ${getCategoryColor(event.category)}`}
                 whileHover={{ scale: 1.05 }}
