@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
-import AnimatedEventsCarousel from '@/components/AnimatedEventsCarousel'
+import GlassEventCarousel from '@/components/GlassEventCarousel'
 import SponsorCarousel from '@/components/SponsorCarousel'
 import { ScrollRevealContainer } from '@/hooks/useScrollReveal'
 
@@ -131,7 +131,7 @@ export default function Home() {
 
       {/* Animated Events Carousel Section */}
       <ScrollRevealContainer animation="fadeIn">
-        <AnimatedEventsCarousel />
+        <GlassEventCarousel />
       </ScrollRevealContainer>
 
       {/* Sponsor Carousel with Animation */}

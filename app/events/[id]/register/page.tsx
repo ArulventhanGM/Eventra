@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, Suspense } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useForm } from 'react-hook-form';
@@ -107,6 +107,8 @@ export default function EventRegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [registrationId, setRegistrationId] = useState<string>('');
+  const [existingRegistration, setExistingRegistration] = useState<any>(null);
+  const [isCheckingRegistration, setIsCheckingRegistration] = useState(false);
 
   const {
     register,
@@ -116,6 +118,42 @@ export default function EventRegistrationPage() {
   } = useForm<FormData>();
 
   const numberOfMembers = watch('numberOfMembers', 1);
+  const emailValue = watch('email');
+
+  // Check for existing registration when email changes
+  const checkExistingRegistration = async (email: string) => {
+    if (!email || !eventId) return;
+    
+    setIsCheckingRegistration(true);
+    try {
+      const response = await fetch(`/api/events/check-registration?eventId=${eventId}&email=${encodeURIComponent(email)}`);
+      const result = await response.json();
+      
+      if (result.success && result.isRegistered) {
+        setExistingRegistration(result.registration);
+      } else {
+        setExistingRegistration(null);
+      }
+    } catch (error) {
+      console.error('Error checking registration:', error);
+      setExistingRegistration(null);
+    } finally {
+      setIsCheckingRegistration(false);
+    }
+  };
+
+  // Debounce email checking
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (emailValue && emailValue.includes('@')) {
+        checkExistingRegistration(emailValue);
+      } else {
+        setExistingRegistration(null);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [emailValue, eventId]);
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
@@ -142,12 +180,28 @@ export default function EventRegistrationPage() {
         setRegistrationId(result.registrationId || 'REG' + Date.now());
         setShowSuccess(true);
       } else {
-        throw new Error('Registration failed');
+        const errorData = await response.json();
+        const errorMessage = errorData.error || 'Registration failed';
+        
+        if (response.status === 409) {
+          // Handle conflict errors (duplicate registration, event full, etc.)
+          alert(`❌ ${errorMessage}`);
+        } else if (response.status === 400) {
+          // Handle validation errors
+          alert(`⚠️ ${errorMessage}`);
+        } else if (response.status === 404) {
+          // Handle not found errors
+          alert(`🔍 ${errorMessage}`);
+        } else {
+          // Handle other errors
+          alert(`❌ ${errorMessage}`);
+        }
+        return; // Don't throw error, just return
       }
     } catch (error) {
       console.error('Registration error:', error);
-      // Handle error - show error message
-      alert('Registration failed. Please try again.');
+      // Handle network or other errors
+      alert('❌ Network error. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -318,6 +372,25 @@ export default function EventRegistrationPage() {
                   />
                   {errors.email && (
                     <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                  )}
+                  {isCheckingRegistration && (
+                    <p className="text-blue-500 text-sm mt-1 flex items-center">
+                      <span className="animate-spin mr-2">⏳</span>
+                      Checking registration status...
+                    </p>
+                  )}
+                  {existingRegistration && (
+                    <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <p className="text-yellow-800 text-sm font-medium flex items-center">
+                        ⚠️ You are already registered for this event!
+                      </p>
+                      <p className="text-yellow-700 text-xs mt-1">
+                        Registered on: {new Date(existingRegistration.registeredAt).toLocaleDateString()}
+                      </p>
+                      <p className="text-yellow-700 text-xs">
+                        Status: {existingRegistration.status}
+                      </p>
+                    </div>
                   )}
                 </motion.div>
 
@@ -491,11 +564,11 @@ export default function EventRegistrationPage() {
               >
                 <motion.button
                   type="submit"
-                  disabled={isSubmitting}
-                  whileHover={{ scale: isSubmitting ? 1 : 1.02, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)" }}
+                  disabled={isSubmitting || existingRegistration}
+                  whileHover={{ scale: (isSubmitting || existingRegistration) ? 1 : 1.02, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)" }}
                   whileTap={{ scale: 0.98 }}
                   className={`w-full py-4 px-8 rounded-xl font-bold text-lg transition-all duration-300 ${
-                    isSubmitting
+                    (isSubmitting || existingRegistration)
                       ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg'
                   } text-white`}
@@ -509,6 +582,8 @@ export default function EventRegistrationPage() {
                       />
                       Processing Registration...
                     </span>
+                  ) : existingRegistration ? (
+                    '✅ Already Registered'
                   ) : (
                     'Complete Registration'
                   )}
