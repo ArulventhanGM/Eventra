@@ -1,3 +1,7 @@
+'use client';
+
+import Link from 'next/link';
+
 // Organizer Dashboard - manage events
 export default function OrganizerDashboard() {
   return (
@@ -27,9 +31,12 @@ export default function OrganizerDashboard() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">My Events</h2>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            <Link 
+              href="/organizer/create-event" 
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+            >
               Create Event
-            </button>
+            </Link>
           </div>
           
           <div className="space-y-4">

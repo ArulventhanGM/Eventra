@@ -84,6 +84,19 @@ export default function Navbar() {
                 Help
               </motion.div>
             </Link>
+
+            {/* Organizer-specific Create Event button */}
+            {session?.user?.role === 'ORGANIZER' && (
+              <Link href="/organizer/create-event">
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="text-white bg-gradient-to-r from-purple-500/80 to-pink-500/80 hover:from-purple-600/90 hover:to-pink-600/90 backdrop-blur-md border border-purple-400/30 hover:border-purple-300/50 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/40"
+                >
+                  ✨ Create Event
+                </motion.div>
+              </Link>
+            )}
             
             {/* User Authentication Section - Glassmorphism */}
             {status === 'loading' ? (
@@ -161,7 +174,7 @@ export default function Navbar() {
                         
                         <Link
                           href="/attendee-schedule"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
+                          className="flex items-center mx-2 px-3 py-2 text-sm text-white/90 hover:text-white bg-black/5 hover:bg-black/10 backdrop-blur-sm border border-gray-400/10 hover:border-gray-300/30 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
                           <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +185,7 @@ export default function Navbar() {
 
                         <Link
                           href="/attendee/tickets"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
+                          className="flex items-center mx-2 px-3 py-2 text-sm text-white/90 hover:text-white bg-black/5 hover:bg-black/10 backdrop-blur-sm border border-gray-400/10 hover:border-gray-300/30 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
                           <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,11 +194,11 @@ export default function Navbar() {
                           My Tickets
                         </Link>
 
-                        <div className="border-t border-gray-100 my-1"></div>
+                        <div className="border-t border-gray-400/20 my-2 mx-2"></div>
 
                         <Link
                           href="/profile"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
+                          className="flex items-center mx-2 px-3 py-2 text-sm text-white/90 hover:text-white bg-black/5 hover:bg-black/10 backdrop-blur-sm border border-gray-400/10 hover:border-gray-300/30 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
                           <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,7 +209,7 @@ export default function Navbar() {
 
                         <Link
                           href="/settings"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
+                          className="flex items-center mx-2 px-3 py-2 text-sm text-white/90 hover:text-white bg-black/5 hover:bg-black/10 backdrop-blur-sm border border-gray-400/10 hover:border-gray-300/30 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
                           <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -292,49 +305,52 @@ export default function Navbar() {
                 <>
                   {/* User Info in Mobile */}
                   <div className="px-3 py-2">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <div className="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-semibold">
+                    <div className="flex items-center space-x-3 mb-3 bg-black/10 backdrop-blur-md border border-gray-400/20 rounded-xl p-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-xs font-semibold border border-gray-300/30">
                         {getUserInitials(session.user.firstName, session.user.lastName)}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900 text-sm">
+                        <p className="font-medium text-white text-sm">
                           {session.user.firstName} {session.user.lastName}
                         </p>
-                        <p className="text-xs text-gray-500">{session.user.email}</p>
+                        <p className="text-xs text-white/70">{session.user.email}</p>
+                        <p className="text-xs text-purple-300 font-medium">
+                          {session.user.role?.toLowerCase()}
+                        </p>
                       </div>
                     </div>
                   </div>
                   
                   <Link 
                     href={getDashboardLink()} 
-                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="text-white/90 hover:text-white bg-black/10 hover:bg-black/20 backdrop-blur-sm border border-gray-400/20 hover:border-gray-300/40 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
                   >
                     Dashboard
                   </Link>
                   <Link 
                     href="/attendee-schedule" 
-                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="text-white/90 hover:text-white bg-black/10 hover:bg-black/20 backdrop-blur-sm border border-gray-400/20 hover:border-gray-300/40 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
                   >
                     My Schedule
                   </Link>
                   <Link 
                     href="/attendee/tickets" 
-                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="text-white/90 hover:text-white bg-black/10 hover:bg-black/20 backdrop-blur-sm border border-gray-400/20 hover:border-gray-300/40 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
                   >
                     My Tickets
                   </Link>
                   
-                  <hr className="my-2" />
+                  <div className="border-t border-gray-400/20 my-2"></div>
                   
                   <Link 
                     href="/profile" 
-                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="text-white/90 hover:text-white bg-black/10 hover:bg-black/20 backdrop-blur-sm border border-gray-400/20 hover:border-gray-300/40 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
                   >
                     Edit Profile
                   </Link>
                   <Link 
                     href="/settings" 
-                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="text-white/90 hover:text-white bg-black/10 hover:bg-black/20 backdrop-blur-sm border border-gray-400/20 hover:border-gray-300/40 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
                   >
                     Account Settings
                   </Link>
